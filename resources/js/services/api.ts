@@ -158,6 +158,139 @@ class ApiService {
     const response = await this.client.post(`/v1/conversations/${conversationId}/messages`, { content });
     return response.data;
   }
+
+  // AI endpoints
+  async generateContent(data: {
+    business_id: string;
+    platform: string;
+    theme: string;
+    tone?: string;
+    audience?: string;
+    details?: string;
+  }) {
+    const response = await this.client.post('/v1/ai/generate-content', data);
+    return response.data;
+  }
+
+  async generateVariations(data: {
+    business_id: string;
+    platform: string;
+    theme: string;
+    count?: number;
+    tone?: string;
+  }) {
+    const response = await this.client.post('/v1/ai/generate-variations', data);
+    return response.data;
+  }
+
+  async suggestHashtags(data: {
+    business_id: string;
+    content: string;
+    platform?: string;
+  }) {
+    const response = await this.client.post('/v1/ai/suggest-hashtags', data);
+    return response.data;
+  }
+
+  async analyzeSentiment(text: string) {
+    const response = await this.client.post('/v1/ai/analyze-sentiment', { text });
+    return response.data;
+  }
+
+  async analyzeReview(reviewId: string) {
+    const response = await this.client.post(`/v1/ai/reviews/${reviewId}/analyze`);
+    return response.data;
+  }
+
+  async generateReviewResponse(reviewId: string, tone?: string) {
+    const response = await this.client.post(`/v1/ai/reviews/${reviewId}/generate-response`, { tone });
+    return response.data;
+  }
+
+  async suggestReviewResponses(reviewId: string, count?: number) {
+    const response = await this.client.post(`/v1/ai/reviews/${reviewId}/suggest-responses`, { count });
+    return response.data;
+  }
+
+  async autoReplyToReview(reviewId: string, tone?: string) {
+    const response = await this.client.post(`/v1/ai/reviews/${reviewId}/auto-reply`, { tone });
+    return response.data;
+  }
+
+  // Customer/CRM endpoints
+  async getCustomers(params?: {
+    page?: number;
+    per_page?: number;
+    tier?: string;
+    segment_id?: string;
+    vip_only?: boolean;
+    at_risk_only?: boolean;
+    search?: string;
+  }) {
+    const response = await this.client.get('/v1/customers', { params });
+    return response.data;
+  }
+
+  async getCustomer(id: string, params?: { include_rfm?: boolean }) {
+    const response = await this.client.get(`/v1/customers/${id}`, { params });
+    return response.data;
+  }
+
+  async createCustomer(data: {
+    email: string;
+    phone?: string;
+    first_name: string;
+    last_name: string;
+    birth_date?: string;
+    preferences?: Record<string, any>;
+    tags?: string[];
+    language?: string;
+    notes?: string;
+  }) {
+    const response = await this.client.post('/v1/customers', data);
+    return response.data;
+  }
+
+  async updateCustomer(id: string, data: Partial<{
+    email: string;
+    phone?: string;
+    first_name: string;
+    last_name: string;
+    birth_date?: string;
+    preferences?: Record<string, any>;
+    tags?: string[];
+    tier?: string;
+    language?: string;
+    notes?: string;
+  }>) {
+    const response = await this.client.put(`/v1/customers/${id}`, data);
+    return response.data;
+  }
+
+  async deleteCustomer(id: string) {
+    const response = await this.client.delete(`/v1/customers/${id}`);
+    return response.data;
+  }
+
+  async getCustomerSegments() {
+    const response = await this.client.get('/v1/customers-segments');
+    return response.data;
+  }
+
+  async getAtRiskCustomers(params?: { page?: number; per_page?: number }) {
+    const response = await this.client.get('/v1/customers-at-risk', { params });
+    return response.data;
+  }
+
+  async getVipCustomers(params?: { page?: number; per_page?: number }) {
+    const response = await this.client.get('/v1/customers-vips', { params });
+    return response.data;
+  }
+
+  async getBirthdayCustomers() {
+    const response = await this.client.get('/v1/customers-birthdays');
+    return response.data;
+  }
 }
 
 export const api = new ApiService();

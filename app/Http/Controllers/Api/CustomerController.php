@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use App\Models\CustomerSegment;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class CustomerController extends Controller
 {
@@ -51,24 +53,24 @@ class CustomerController extends Controller
 
         $customers = $query->paginate($request->per_page ?? 15);
 
-        return response()->json($customers);
+        return CustomerResource::collection($customers);
     }
 
     /**
      * Display the specified customer
      */
-    public function show(Customer $customer): JsonResponse
+    public function show(Request $request, Customer $customer): JsonResponse
     {
         $customer->load(['visits' => function ($query) {
             $query->latest('visited_at')->limit(10);
         }, 'segments']);
 
-        $rfmScore = $customer->getRFMScore();
+        $resource = new CustomerResource($customer);
 
         return response()->json([
-            'data' => $customer,
+            'data' => $resource,
             'stats' => [
-                'rfm_score' => $rfmScore,
+                'rfm_score' => $customer->getRFMScore(),
                 'average_spend' => $customer->average_spend,
                 'is_vip' => $customer->is_vip,
                 'at_risk' => $customer->isAtRiskOfChurn(),
@@ -98,7 +100,7 @@ class CustomerController extends Controller
 
         return response()->json([
             'message' => 'Customer created successfully',
-            'data' => $customer,
+            'data' => new CustomerResource($customer),
         ], 201);
     }
 
@@ -124,7 +126,7 @@ class CustomerController extends Controller
 
         return response()->json([
             'message' => 'Customer updated successfully',
-            'data' => $customer->fresh(),
+            'data' => new CustomerResource($customer->fresh()),
         ]);
     }
 
@@ -160,7 +162,7 @@ class CustomerController extends Controller
             ->orderBy('last_visit_at', 'asc')
             ->paginate(20);
 
-        return response()->json($customers);
+        return CustomerResource::collection($customers);
     }
 
     /**
@@ -173,7 +175,7 @@ class CustomerController extends Controller
             ->orderBy('lifetime_value', 'desc')
             ->paginate(20);
 
-        return response()->json($customers);
+        return CustomerResource::collection($customers);
     }
 
     /**
@@ -186,6 +188,6 @@ class CustomerController extends Controller
             ->orderBy('birth_date', 'asc')
             ->get();
 
-        return response()->json(['data' => $customers]);
+        return response()->json(['data' => CustomerResource::collection($customers)]);
     }
 }
