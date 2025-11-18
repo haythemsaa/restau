@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BusinessController;
 use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\ReviewController;
@@ -11,24 +12,33 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
 */
 
-// Public routes (no authentication required for now)
+// Public routes
 Route::get('/health', function () {
     return response()->json([
         'status' => 'ok',
         'timestamp' => now()->toISOString(),
         'service' => 'RestauBoost API',
+        'version' => '1.0.0',
     ]);
 });
 
-// Protected API routes (will require authentication in production)
-Route::prefix('v1')->group(function () {
+// Authentication routes (public)
+Route::prefix('auth')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+
+    // Protected auth routes
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/me', [AuthController::class, 'me']);
+        Route::post('/refresh', [AuthController::class, 'refresh']);
+    });
+});
+
+// Protected API routes (require authentication)
+Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     // Businesses
     Route::apiResource('businesses', BusinessController::class);
@@ -47,18 +57,4 @@ Route::prefix('v1')->group(function () {
         ->name('conversations.messages.store');
     Route::get('conversations/{conversation}/messages', [ConversationController::class, 'messages'])
         ->name('conversations.messages.index');
-
-    // User profile (requires authentication)
-    Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-        return $request->user()->load('businesses');
-    });
-});
-
-// Future routes for authentication (to be implemented)
-Route::prefix('auth')->group(function () {
-    // Route::post('/register', [AuthController::class, 'register']);
-    // Route::post('/login', [AuthController::class, 'login']);
-    // Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-    // Route::post('/mfa/enable', [MfaController::class, 'enable'])->middleware('auth:sanctum');
-    // Route::post('/mfa/verify', [MfaController::class, 'verify']);
 });
