@@ -554,3 +554,404 @@ L'API utilise le versioning dans l'URL:
 Pour toute question ou problème, consultez:
 - Repository: https://github.com/haythemsaa/restau
 - Documentation: README.md
+
+---
+
+## IA - Intelligence Artificielle 🤖
+
+### Génération de Contenu
+
+#### Generate Social Media Content
+
+Génère du contenu optimisé pour les réseaux sociaux avec l'IA.
+
+**Endpoint:** `POST /v1/ai/generate-content`
+
+**Request Body:**
+```json
+{
+  "business_id": "9d3e5b8c-...",
+  "platform": "instagram",
+  "theme": "Nouveau menu d'automne",
+  "tone": "friendly",
+  "audience": "food lovers",
+  "details": "Plats à base de produits de saison"
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "content": "🍂 L'automne arrive chez [Restaurant]!\n\nDécouvrez notre nouveau menu...",
+    "hashtags": ["automne", "cuisine", "produitsdeSaison"],
+    "word_count": 145,
+    "best_time": {
+      "best_days": ["Mardi", "Mercredi", "Jeudi"],
+      "best_hours": ["11:00-13:00", "19:00-21:00"]
+    }
+  }
+}
+```
+
+#### Generate Content Variations
+
+Génère plusieurs variations de contenu.
+
+**Endpoint:** `POST /v1/ai/generate-variations`
+
+**Parameters:** Même que `/generate-content` + `count` (1-5)
+
+#### Suggest Hashtags
+
+Suggère des hashtags pertinents.
+
+**Endpoint:** `POST /v1/ai/suggest-hashtags`
+
+**Request Body:**
+```json
+{
+  "content": "Découvrez notre nouveau menu...",
+  "industry": "restaurant"
+}
+```
+
+---
+
+### Analyse de Sentiment
+
+#### Analyze Text Sentiment
+
+Analyse le sentiment d'un texte.
+
+**Endpoint:** `POST /v1/ai/analyze-sentiment`
+
+**Request Body:**
+```json
+{
+  "text": "Excellent restaurant, très bon accueil!"
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "overall_sentiment": {
+      "score": 0.85,
+      "label": "Très Positif"
+    },
+    "aspects": {
+      "food": {"score": 0.9, "mentions": ["excellent"]},
+      "service": {"score": 0.8, "mentions": ["bon accueil"]}
+    },
+    "emotions": ["joy", "satisfaction"],
+    "insights": ["Point fort: service", "Client très satisfait"],
+    "priority": "LOW",
+    "recommended_action": "Répondre dans la semaine..."
+  }
+}
+```
+
+#### Analyze Review
+
+Analyse complète d'un avis avec sauvegarde en DB.
+
+**Endpoint:** `POST /v1/ai/reviews/{review}/analyze`
+
+**Response:** Même structure que ci-dessus avec `review_id`
+
+---
+
+### Réponses Automatiques aux Avis
+
+#### Generate Review Response
+
+Génère une réponse professionnelle à un avis.
+
+**Endpoint:** `POST /v1/ai/reviews/{review}/generate-response`
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "response": "Bonjour Marie,\n\nMerci infiniment pour votre retour...",
+    "word_count": 87
+  }
+}
+```
+
+#### Suggest Multiple Responses
+
+Génère 3 suggestions de réponses avec des tons différents.
+
+**Endpoint:** `POST /v1/ai/reviews/{review}/suggest-responses`
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "suggestions": [
+      {
+        "id": 1,
+        "content": "...",
+        "tone": "professional",
+        "length": 95
+      },
+      {
+        "id": 2,
+        "content": "...",
+        "tone": "warm",
+        "length": 102
+      },
+      {
+        "id": 3,
+        "content": "...",
+        "tone": "enthusiastic",
+        "length": 89
+      }
+    ],
+    "review": {
+      "id": "...",
+      "rating": 5,
+      "text": "...",
+      "author": "Marie Dupont"
+    }
+  }
+}
+```
+
+#### Auto-Reply to Review
+
+Publie automatiquement une réponse générée par IA.
+
+**Endpoint:** `POST /v1/ai/reviews/{review}/auto-reply`
+
+**Request Body (optional):**
+```json
+{
+  "custom_message": "Message personnalisé si vous ne voulez pas l'IA"
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "message": "Response posted successfully",
+  "data": {
+    "review_id": "...",
+    "reply": "...",
+    "replied_at": "2024-11-18T15:30:00Z"
+  }
+}
+```
+
+---
+
+## CRM - Gestion de la Clientèle 👥
+
+### Customers
+
+#### List Customers
+
+**Endpoint:** `GET /v1/customers`
+
+**Query Parameters:**
+- `tier` (optional): Filter by tier (regular, vip, super_vip)
+- `segment_id` (optional): Filter by segment
+- `vip_only` (optional): Boolean, show only VIP customers
+- `at_risk_only` (optional): Boolean, show only at-risk customers
+- `search` (optional): Search in name/email
+- `page`, `per_page`: Pagination
+
+**Response:** `200 OK`
+```json
+{
+  "data": [
+    {
+      "id": "...",
+      "email": "jean@example.com",
+      "first_name": "Jean",
+      "last_name": "Martin",
+      "full_name": "Jean Martin",
+      "birth_date": "1985-06-15",
+      "tier": "vip",
+      "lifetime_value": 1250.50,
+      "visit_count": 15,
+      "last_visit_at": "2024-11-10T19:30:00Z",
+      "average_spend": 83.37,
+      "is_vip": true,
+      "segments": [...]
+    }
+  ],
+  "meta": {...}
+}
+```
+
+#### Get Customer Details
+
+**Endpoint:** `GET /v1/customers/{id}`
+
+**Response:** `200 OK`
+```json
+{
+  "data": {
+    "id": "...",
+    "email": "jean@example.com",
+    ...
+  },
+  "stats": {
+    "rfm_score": {
+      "recency": 5,
+      "frequency": 4,
+      "monetary": 5,
+      "total_score": 4.67,
+      "segment": "Champions"
+    },
+    "average_spend": 83.37,
+    "is_vip": true,
+    "at_risk": false,
+    "is_birthday": false
+  }
+}
+```
+
+#### Create Customer
+
+**Endpoint:** `POST /v1/customers`
+
+**Request Body:**
+```json
+{
+  "email": "new@customer.com",
+  "phone": "+33123456789",
+  "first_name": "Sophie",
+  "last_name": "Dubois",
+  "birth_date": "1990-03-20",
+  "preferences": {
+    "dietary": ["vegetarian"],
+    "allergies": []
+  },
+  "tags": ["food-blogger"],
+  "language": "fr"
+}
+```
+
+#### Update Customer
+
+**Endpoint:** `PUT /v1/customers/{id}`
+
+#### Delete Customer
+
+**Endpoint:** `DELETE /v1/customers/{id}`
+
+---
+
+### Customer Segments
+
+#### Get All Segments
+
+**Endpoint:** `GET /v1/customers-segments`
+
+**Response:** `200 OK`
+```json
+{
+  "data": [
+    {
+      "id": "...",
+      "name": "VIP",
+      "description": "High-value loyal customers",
+      "criteria": {
+        "lifetime_value_min": 500,
+        "visit_count_min": 10
+      },
+      "auto_update": true,
+      "customer_count": 47
+    }
+  ]
+}
+```
+
+#### Get At-Risk Customers
+
+Clients qui n'ont pas visité depuis 60+ jours.
+
+**Endpoint:** `GET /v1/customers-at-risk`
+
+#### Get VIP Customers
+
+Clients VIP et Super VIP triés par valeur.
+
+**Endpoint:** `GET /v1/customers-vips`
+
+#### Get Birthday Customers
+
+Clients dont c'est l'anniversaire ce mois-ci.
+
+**Endpoint:** `GET /v1/customers-birthdays`
+
+---
+
+## Nouvelles Fonctionnalités IA - Résumé
+
+### 🎨 Génération de Contenu
+- ✅ Contenu social media optimisé par plateforme
+- ✅ Suggestions de hashtags intelligentes
+- ✅ Meilleurs moments de publication
+- ✅ Multiple variations d'un même thème
+
+### 🧠 Analyse de Sentiment
+- ✅ Score de sentiment global (-1 à +1)
+- ✅ Analyse par aspect (nourriture, service, ambiance, prix)
+- ✅ Détection d'émotions (joie, déception, colère, surprise)
+- ✅ Insights actionnables automatiques
+- ✅ Priorisation automatique (LOW, MEDIUM, HIGH, URGENT)
+
+### 💬 Réponses Automatiques
+- ✅ Génération de réponses personnalisées
+- ✅ Adaptation du ton selon la note
+- ✅ 3 suggestions avec tons différents
+- ✅ Validation et contrôle qualité
+- ✅ Publication automatique
+
+### 👥 CRM Complet
+- ✅ Profils clients unifiés
+- ✅ Analyse RFM (Recency, Frequency, Monetary)
+- ✅ Segmentation automatique
+- ✅ Détection clients à risque
+- ✅ Programme VIP automatique
+- ✅ Campagnes d'anniversaire
+- ✅ Historique des visites
+
+---
+
+## Stack Technique Mis à Jour
+
+**Backend:**
+- Laravel 10 + PHP 8.2
+- OpenAI GPT-4 API
+- PostgreSQL 15
+- Redis
+
+**Frontend:**
+- Vue.js 3 + TypeScript
+- Tailwind CSS
+- Pinia (State Management)
+- Axios
+
+**IA & ML:**
+- OpenAI GPT-4 pour génération
+- Analyse sentiment multi-dimensionnelle
+- Détection émotions
+
+**Intégrations:**
+- Google My Business
+- Facebook/Instagram
+- Yelp, TripAdvisor
+- Email/SMS providers
+

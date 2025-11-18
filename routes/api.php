@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\BusinessController;
 use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SocialPostController;
+use App\Http\Controllers\Api\AIController;
+use App\Http\Controllers\Api\CustomerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -57,4 +59,28 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         ->name('conversations.messages.store');
     Route::get('conversations/{conversation}/messages', [ConversationController::class, 'messages'])
         ->name('conversations.messages.index');
+
+    // AI Features
+    Route::prefix('ai')->group(function () {
+        // Content Generation
+        Route::post('/generate-content', [AIController::class, 'generateContent']);
+        Route::post('/generate-variations', [AIController::class, 'generateVariations']);
+        Route::post('/suggest-hashtags', [AIController::class, 'suggestHashtags']);
+
+        // Sentiment Analysis
+        Route::post('/analyze-sentiment', [AIController::class, 'analyzeSentiment']);
+        Route::post('/reviews/{review}/analyze', [AIController::class, 'analyzeReview']);
+
+        // Review Responses
+        Route::post('/reviews/{review}/generate-response', [AIController::class, 'generateReviewResponse']);
+        Route::post('/reviews/{review}/suggest-responses', [AIController::class, 'suggestReviewResponses']);
+        Route::post('/reviews/{review}/auto-reply', [AIController::class, 'autoReply']);
+    });
+
+    // CRM & Customers
+    Route::apiResource('customers', CustomerController::class);
+    Route::get('/customers-segments', [CustomerController::class, 'segments']);
+    Route::get('/customers-at-risk', [CustomerController::class, 'atRisk']);
+    Route::get('/customers-vips', [CustomerController::class, 'vips']);
+    Route::get('/customers-birthdays', [CustomerController::class, 'birthdays']);
 });
