@@ -16,6 +16,10 @@ class DatabaseSeeder extends Seeder
             BusinessGroupSeeder::class,
             BusinessSeeder::class,
             ReviewSeeder::class,
+            CustomerSeeder::class,
+            CustomerVisitSeeder::class,
+            EmailTemplateSeeder::class,
+            EmailCampaignSeeder::class,
         ]);
     }
 }

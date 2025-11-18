@@ -1,0 +1,32 @@
+{
+  "name": "RestauBoostMobile",
+  "displayName": "RestauBoost",
+  "description": "Application mobile pour RestauBoost - Plateforme de marketing pour restaurants",
+  "version": "1.0.0",
+  "orientation": "portrait",
+  "icon": "./assets/icon.png",
+  "splash": {
+    "image": "./assets/splash.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#6366f1"
+  },
+  "updates": {
+    "fallbackToCacheTimeout": 0
+  },
+  "assetBundlePatterns": [
+    "**/*"
+  ],
+  "ios": {
+    "supportsTablet": true,
+    "bundleIdentifier": "com.restauboost.mobile",
+    "buildNumber": "1.0.0"
+  },
+  "android": {
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/adaptive-icon.png",
+      "backgroundColor": "#6366f1"
+    },
+    "package": "com.restauboost.mobile",
+    "versionCode": 1
+  }
+}
