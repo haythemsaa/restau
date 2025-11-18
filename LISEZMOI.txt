@@ -1,0 +1,36 @@
+CAHIER DES CHARGES - PLATEFORME MARKETING RESTAURANTS
+=====================================================
+
+Ce cahier des charges est divisé en 3 parties :
+
+✅ PARTIE 1 (50 KB) - DISPONIBLE
+- Présentation générale et contexte
+- Module 1 : Référencement Local (SEO) - COMPLET
+- Module 2 : E-Réputation - COMPLET  
+- Module 3 : Community Management - COMPLET
+
+📄 PARTIE 2 (En cours de création)
+- Module 4 : Messagerie Unifiée
+- Module 5 : Présence Management
+- Module 6 : Analytics & Reporting
+
+📄 PARTIE 3 (À venir)
+- Module 7 : Intelligence Artificielle
+- Module 8 : Intégrations
+- Module 9 : Administration
+- Architecture Technique Laravel
+- Base de données et API
+- Sécurité et Conformité RGPD
+- Roadmap de développement
+- Budget et ressources
+
+UTILISATION:
+- Les fichiers .md peuvent être ouverts avec n'importe quel éditeur de texte
+- Recommandé : VS Code, Typora, ou tout éditeur Markdown
+- Conversion possible en PDF/DOCX avec Pandoc ou outils en ligne
+
+CONTACT:
+Pour toute question sur ces spécifications, contactez l'équipe projet.
+
+Date : 18 Novembre 2025
+Version : 1.0
