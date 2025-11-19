@@ -1,0 +1,134 @@
+version: '3.8'
+
+services:
+  # PHP-FPM
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: restauboost_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - restauboost
+    depends_on:
+      - postgres
+      - redis
+
+  # Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: restauboost_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - restauboost
+    depends_on:
+      - app
+
+  # PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: restauboost_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-restauboost}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - restauboost
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: restauboost_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - restauboost
+
+  # Queue Worker
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: restauboost_queue
+    restart: unless-stopped
+    working_dir: /var/www
+    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+    volumes:
+      - ./:/var/www
+    networks:
+      - restauboost
+    depends_on:
+      - app
+      - postgres
+      - redis
+
+  # Scheduler (Cron)
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: restauboost_scheduler
+    restart: unless-stopped
+    working_dir: /var/www
+    command: >
+      sh -c "while true; do
+        php artisan schedule:run --verbose --no-interaction &
+        sleep 60
+      done"
+    volumes:
+      - ./:/var/www
+    networks:
+      - restauboost
+    depends_on:
+      - app
+
+  # Node (for builds)
+  node:
+    image: node:18-alpine
+    container_name: restauboost_node
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    networks:
+      - restauboost
+    command: npm run dev
+
+  # Mailpit (for email testing)
+  mailpit:
+    image: axllent/mailpit
+    container_name: restauboost_mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - restauboost
+
+networks:
+  restauboost:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
